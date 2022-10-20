@@ -81,7 +81,7 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                 ctx.log.info(`${collatorRound.apr}`)
                 ctx.log.info(`${collatorLastRound?.apr}`)
                 const marker = 0
-                if (collatorLastRound != null) {
+                if (collatorLastRound) {
                     const Apr = staker.apr24h || 0
                     const lastApr = collatorLastRound?.apr || 0
                     const avgApr = Apr * 4

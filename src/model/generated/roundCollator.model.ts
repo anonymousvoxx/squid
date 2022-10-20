@@ -26,6 +26,15 @@ export class RoundCollator {
   @Column_("numeric", {nullable: false})
   commission!: number
 
+  @Column_("numeric", {nullable: true})
+  apr!: number | undefined | null
+
+  @Column_("numeric", {nullable: true})
+  aprTechnNumerator!: number | undefined | null
+
+  @Column_("numeric", {nullable: true})
+  aprTechnDenominator!: number | undefined | null
+
   @OneToMany_(() => RoundNomination, e => e.collator)
   nominators!: RoundNomination[]
 

@@ -26,5 +26,5 @@ export class RoundNomination {
   nominator!: RoundNominator
 
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-  vote!: bigint
+  amount!: bigint
 }

@@ -24,6 +24,3 @@ processor.addEventHandler('ParachainStaking.DelegationIncreased', modules.stakin
 processor.addEventHandler('ParachainStaking.DelegationRevoked', modules.staking.events.handleDelegationRevoked)
 
 processor.run()
-
-
-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

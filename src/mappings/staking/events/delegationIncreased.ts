@@ -1,9 +1,9 @@
 import { UnknownVersionError } from '../../../common/errors'
 import { encodeId } from '../../../common/tools'
-import { BondType } from '../../../model'
+import {HistoryElement, Round, RoundCollator} from '../../../model'
 import { ParachainStakingDelegationIncreasedEvent } from '../../../types/generated/events'
 import { EventContext, EventHandlerContext } from '../../types/contexts'
-import { saveBond } from './utils'
+import {createStaker, getOrCreateStaker} from "../../util/entities";
 
 interface EventData {
     account: Uint8Array
@@ -34,16 +34,33 @@ function getEventData(ctx: EventContext): EventData {
 
 export async function handleDelegationIncreased(ctx: EventHandlerContext) {
     const data = getEventData(ctx)
+    const accountId = encodeId(data.account)
+    const round = await ctx.store.get(Round, { where: {}, order: { index: 'DESC' } })
 
-    await saveBond(ctx, {
+    const staker = await getOrCreateStaker(ctx, accountId)
+    if (!staker) {
+        await createStaker(ctx, {
+            stashId: accountId,
+            activeBond: 0n,
+        })
+    }
+
+    await ctx.store.insert(new HistoryElement({
         id: ctx.event.id,
         blockNumber: ctx.block.height,
         timestamp: new Date(ctx.block.timestamp),
-        extrinsicHash: ctx.event.extrinsic?.hash,
-        accountId: encodeId(data.account),
-        candidateId: encodeId(data.candidate),
+        type: 1,
+        round: round,
         amount: data.amount,
-        type: BondType.Bond,
-        success: true,
-    })
+        staker: staker,
+    }))
+
+    if (round && staker) {
+        const collatorRound = await ctx.store.get(RoundCollator, {where: {id: `${round?.index}-${staker?.stashId}`}})
+        if (collatorRound) {
+            collatorRound.totalBond = collatorRound.totalBond + data.amount
+            collatorRound.round = round
+            await ctx.store.save(collatorRound)
+        }
+    }
 }

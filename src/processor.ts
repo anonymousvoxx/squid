@@ -22,34 +22,5 @@ processor.addEventHandler('ParachainStaking.Delegation', modules.staking.events.
 processor.addEventHandler('ParachainStaking.DelegationDecreased', modules.staking.events.handleDelegationDecreased)
 processor.addEventHandler('ParachainStaking.DelegationIncreased', modules.staking.events.handleDelegationIncreased)
 processor.addEventHandler('ParachainStaking.DelegationRevoked', modules.staking.events.handleDelegationRevoked)
-processor.addEventHandler('ParachainStaking.DelegatorLeft', modules.staking.events.handleDelegatorLeft)
-processor.addEventHandler(
-    'ParachainStaking.DelegatorLeftCandidate',
-    modules.staking.events.handleDelegatorLeftCandidate
-)
-processor.addEventHandler('ParachainStaking.CandidateLeft', modules.staking.events.handleCandidateLeft)
-processor.addEventHandler(
-    'ParachainStaking.JoinedCollatorCandidates',
-    modules.staking.events.handleJoinedCollatorCandidates
-)
-
-//old events
-processor.addEventHandler('ParachainStaking.CollatorBondedMore', modules.staking.events.old.handleCollatorBondedMore)
-processor.addEventHandler('ParachainStaking.CollatorBondedLess', modules.staking.events.old.handleCollatorBondedLess)
-processor.addEventHandler('ParachainStaking.Nomination', modules.staking.events.old.handleNomination)
-processor.addEventHandler('ParachainStaking.NominationDecreased', modules.staking.events.old.handleNominationDecreased)
-processor.addEventHandler('ParachainStaking.NominationIncreased', modules.staking.events.old.handleNominationIncreased)
-processor.addEventHandler('ParachainStaking.NominatorLeft', modules.staking.events.old.handleNominatorLeft)
-processor.addEventHandler(
-    'ParachainStaking.NominatorLeftCollator',
-    modules.staking.events.old.handleNominatorLeftCandidate
-)
-processor.addEventHandler('ParachainStaking.CollatorLeft', modules.staking.events.old.handleCollatorLeft)
-
-//extrinsics handlers
-processor.addCallHandler('Balances.transfer', modules.balances.extrinsics.handleTransfer)
-processor.addCallHandler('Balances.transfer_keep_alive', modules.balances.extrinsics.handleTransferKeepAlive)
-processor.addCallHandler('Balances.force_transfer', modules.balances.extrinsics.handleForceTransfer)
-processor.addCallHandler('Balances.transfer_all', modules.balances.extrinsics.handleTransferAll)
 
 processor.run()

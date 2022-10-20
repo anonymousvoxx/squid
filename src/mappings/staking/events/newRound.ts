@@ -118,12 +118,13 @@ export async function handleNewRound(ctx: EventHandlerContext) {
         const nominator = nominators.get(delegationsData[i].nominatorId)
         assert(collator != null && nominator != null)
 
+        // @ts-ignore
         delegations[i] = new RoundNomination({
             id: `${round.index}-${collator.staker.id}-${nominator.staker.id}`,
             round,
             collator,
             nominator,
-            vote: delegationsData[i].vote,
+            amount: delegationsData[i].vote,
         })
     }
 

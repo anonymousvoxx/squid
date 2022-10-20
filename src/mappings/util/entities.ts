@@ -1,13 +1,6 @@
 import {
     Account,
-    AccountTransfer,
     Staker,
-    StakingRole,
-    Transfer,
-    TransferAssetToken,
-    TransferDirection,
-    TransferLocationAccount,
-    TransferType,
 } from '../../model'
 import { CommonHandlerContext } from '../types/contexts'
 import { createPrevStorageContext, getMeta } from './actions'
@@ -65,7 +58,6 @@ export async function getOrCreateStaker(ctx: CommonHandlerContext, id: string): 
             staker = await createStaker(ctx, {
                 stashId: id,
                 activeBond: collatorData.bond,
-                role: StakingRole.Collator,
             })
         }
 
@@ -74,7 +66,6 @@ export async function getOrCreateStaker(ctx: CommonHandlerContext, id: string): 
             staker = await createStaker(ctx, {
                 stashId: id,
                 activeBond: nominatorData.bond,
-                role: StakingRole.Nominator,
             })
         }
 
@@ -115,7 +106,6 @@ export async function getOrCreateStakers(ctx: CommonHandlerContext, ids: string[
             const staker = await createStaker(ctx, {
                 stashId,
                 activeBond: collatorData.bond,
-                role: StakingRole.Collator,
                 commission: DefaultCollatorCommission,
             })
             newStakers.set(stashId, staker)
@@ -134,7 +124,6 @@ export async function getOrCreateStakers(ctx: CommonHandlerContext, ids: string[
             const staker = await createStaker(ctx, {
                 stashId,
                 activeBond: nominatorData.bond,
-                role: StakingRole.Nominator,
             })
             newStakers.set(stashId, staker)
         }
@@ -146,7 +135,6 @@ export async function getOrCreateStakers(ctx: CommonHandlerContext, ids: string[
 interface StakerData {
     stashId: string
     activeBond?: bigint
-    role?: StakingRole
     commission?: number
 }
 
@@ -156,7 +144,6 @@ export async function createStaker(ctx: CommonHandlerContext, data: StakerData) 
     const staker = new Staker({
         id: data.stashId,
         stash,
-        role: data.role || StakingRole.Idle,
         activeBond: data.activeBond || 0n,
         totalReward: 0n,
         commission: data.commission || DefaultCollatorCommission,
@@ -164,59 +151,4 @@ export async function createStaker(ctx: CommonHandlerContext, data: StakerData) 
     await ctx.store.save(staker)
 
     return staker
-}
-
-export interface TransferData extends ActionData {
-    fromId: string
-    toId: string | null
-    amount: bigint
-    success: boolean
-    type: TransferType
-}
-
-export async function saveTransfer(ctx: CommonHandlerContext, data: TransferData) {
-    const { fromId, toId, amount, success, type } = data
-
-    const from = await getOrCreateAccount(ctx, fromId)
-    const to = toId ? await getOrCreateAccount(ctx, toId) : null
-
-    const transfer = new Transfer({
-        ...getMeta(data),
-        from: new TransferLocationAccount({
-            id: fromId,
-        }),
-        to: toId
-            ? new TransferLocationAccount({
-                  id: toId,
-              })
-            : null,
-        asset: new TransferAssetToken({
-            symbol: 'GLMR',
-            amount,
-        }),
-        success,
-        type,
-    })
-
-    await ctx.store.insert(transfer)
-
-    await ctx.store.insert(
-        new AccountTransfer({
-            id: `${transfer.id}-from`,
-            transfer,
-            account: from,
-            direction: TransferDirection.From,
-        })
-    )
-
-    if (to) {
-        await ctx.store.insert(
-            new AccountTransfer({
-                id: `${transfer.id}-to`,
-                transfer,
-                account: to,
-                direction: TransferDirection.To,
-            })
-        )
-    }
 }

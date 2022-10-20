@@ -87,28 +87,27 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                     if (lastApr > 0) {
                         staker.apr24h = (avgApr - lastApr + collatorRound.apr) / 4
                     }
-                    if (collatorLastRound.apr === null) {
-                            const collatorLastRound3 = await ctx.store.get(RoundCollator, {
-                                where: {id: `${round.index-5}-${staker.stashId}` }})
-                            const collatorLastRound3Apr = collatorLastRound3?.apr || 0
-                            const collatorLastRound2 = await ctx.store.get(RoundCollator, {
-                                where: {id: `${round.index-4}-${staker.stashId}` }})
-                            const collatorLastRound2Apr = collatorLastRound2?.apr || 0
-                            const collatorLastRound1 = await ctx.store.get(RoundCollator, {
-                                where: {id: `${round.index-3}-${staker.stashId}` }})
-                            const collatorLastRound1Apr = collatorLastRound1?.apr || 0
-                            staker.apr24h = (
-                                collatorLastRound3Apr + collatorLastRound2Apr + collatorLastRound1Apr + collatorRound.apr
-                            ) / 4
+                    else {
+                        const collatorLastRound3 = await ctx.store.get(RoundCollator, {
+                            where: {id: `${round.index-5}-${staker.stashId}` }})
+                        const collatorLastRound3Apr = collatorLastRound3?.apr || 0
+                        const collatorLastRound2 = await ctx.store.get(RoundCollator, {
+                            where: {id: `${round.index-4}-${staker.stashId}` }})
+                        const collatorLastRound2Apr = collatorLastRound2?.apr || 0
+                        const collatorLastRound1 = await ctx.store.get(RoundCollator, {
+                            where: {id: `${round.index-3}-${staker.stashId}` }})
+                        const collatorLastRound1Apr = collatorLastRound1?.apr || 0
+                        staker.apr24h = (
+                            collatorLastRound3Apr + collatorLastRound2Apr + collatorLastRound1Apr + collatorRound.apr
+                        ) / 4
                     }
                 }
                 else {
                     staker.apr24h = (collatorRound.apr) / 4
                 }
                 await ctx.store.save(staker)
+                ctx.log.info(`apr24h: ${staker.apr24h}`)
             }
-
-
 
 
             await ctx.store.insert(

@@ -81,9 +81,28 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                     if (collatorLastRound.apr != null) {
                         const lastApr = staker.apr24h || 0
                         const avgApr = lastApr * 4
-                        staker.apr24h = (avgApr - collatorLastRound.apr + collatorRound.apr) / 4
-                        await ctx.store.save(staker)
+                        if (lastApr > 0) {
+                            staker.apr24h = (avgApr - collatorLastRound.apr + collatorRound.apr) / 4
+                        }
+                        else {
+                            const collatorLastRound3 = await ctx.store.get(RoundCollator, {
+                                where: {id: `${round.index-3}-${staker.stashId}` }})
+                            const collatorLastRound3Apr = collatorLastRound3?.apr || 0
+                            const collatorLastRound2 = await ctx.store.get(RoundCollator, {
+                                where: {id: `${round.index-2}-${staker.stashId}` }})
+                            const collatorLastRound2Apr = collatorLastRound2?.apr || 0
+                            const collatorLastRound1 = await ctx.store.get(RoundCollator, {
+                                where: {id: `${round.index-1}-${staker.stashId}` }})
+                            const collatorLastRound1Apr = collatorLastRound1?.apr || 0
+                            staker.apr24h = (
+                                collatorLastRound3Apr + collatorLastRound2Apr + collatorLastRound1Apr + collatorRound.apr
+                            ) / 4
+                        }
                     }
+                    else {
+                        staker.apr24h = (collatorRound.apr) / 4
+                    }
+                    await ctx.store.save(staker)
                 }
             }
 

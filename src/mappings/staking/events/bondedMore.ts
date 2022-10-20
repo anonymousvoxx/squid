@@ -42,6 +42,7 @@ export async function handleBondedMore(ctx: EventHandlerContext) {
         await createStaker(ctx, {
             stashId: accountId,
             activeBond: 0n,
+            role: 'collator'
         })
     }
 

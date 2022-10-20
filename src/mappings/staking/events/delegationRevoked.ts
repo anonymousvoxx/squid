@@ -42,6 +42,7 @@ export async function handleDelegationRevoked(ctx: EventHandlerContext) {
         await createStaker(ctx, {
             stashId: accountId,
             activeBond: 0n,
+            role: 'delegator'
         })
     }
 

@@ -58,6 +58,7 @@ export async function getOrCreateStaker(ctx: CommonHandlerContext, id: string): 
             staker = await createStaker(ctx, {
                 stashId: id,
                 activeBond: collatorData.bond,
+                role: 'collator'
             })
         }
 
@@ -66,6 +67,7 @@ export async function getOrCreateStaker(ctx: CommonHandlerContext, id: string): 
             staker = await createStaker(ctx, {
                 stashId: id,
                 activeBond: nominatorData.bond,
+                role: 'delegator'
             })
         }
 
@@ -107,6 +109,7 @@ export async function getOrCreateStakers(ctx: CommonHandlerContext, ids: string[
                 stashId,
                 activeBond: collatorData.bond,
                 commission: DefaultCollatorCommission,
+                role: 'collator'
             })
             newStakers.set(stashId, staker)
         }
@@ -124,6 +127,7 @@ export async function getOrCreateStakers(ctx: CommonHandlerContext, ids: string[
             const staker = await createStaker(ctx, {
                 stashId,
                 activeBond: nominatorData.bond,
+                role: 'delegator'
             })
             newStakers.set(stashId, staker)
         }
@@ -136,6 +140,7 @@ interface StakerData {
     stashId: string
     activeBond?: bigint
     commission?: number
+    role: string
 }
 
 export async function createStaker(ctx: CommonHandlerContext, data: StakerData) {
@@ -144,6 +149,7 @@ export async function createStaker(ctx: CommonHandlerContext, data: StakerData) 
     const staker = new Staker({
         id: data.stashId,
         stash,
+        role: data.role,
         activeBond: data.activeBond || 0n,
         totalReward: 0n,
         commission: data.commission || DefaultCollatorCommission,

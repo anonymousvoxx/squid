@@ -9,6 +9,7 @@ type Staker @entity {
   id: ID! #stash Id
   stashId: ID!
   stash: Account! @unique
+  role: String
   commission: Float
   activeBond: BigInt!
   totalReward: BigInt!

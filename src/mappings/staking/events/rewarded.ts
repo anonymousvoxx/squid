@@ -105,6 +105,13 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                             ctx.log.info(
                                 `apreq: ${collatorLastRound1Apr} + ${collatorLastRound2Apr} + ${collatorLastRound3Apr} + ${collatorRound.apr}`
                             )
+                            const eqapr = (collatorLastRound3Apr +
+                                    collatorLastRound2Apr +
+                                    collatorLastRound1Apr +
+                                    collatorRound.apr) /
+                                4
+                            ctx.log.info(`eqapr ${eqapr}`)
+
                             staker.apr24h =
                                 (collatorLastRound3Apr +
                                     collatorLastRound2Apr +

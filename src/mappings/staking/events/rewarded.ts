@@ -102,6 +102,9 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                                 where: { id: `${round.index - 3}-${staker.stashId}` },
                             })
                             const collatorLastRound1Apr = collatorLastRound1?.apr || 0
+                            ctx.log.info(
+                                `apreq: ${collatorLastRound1Apr} + ${collatorLastRound2Apr} + ${collatorLastRound3Apr} + ${collatorRound.apr}`
+                            )
                             staker.apr24h =
                                 (collatorLastRound3Apr +
                                     collatorLastRound2Apr +
@@ -114,6 +117,9 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                         staker.apr24h = collatorRound.apr / 4
                         ctx.log.info(`apr24h: ${staker.apr24h} marker ${3}`)
                     }
+                } else {
+                    staker.apr24h = collatorRound.apr / 4
+                    ctx.log.info(`apr24h: ${staker.apr24h} marker ${5}`)
                 }
                 await ctx.store.save(staker)
             }

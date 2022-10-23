@@ -111,17 +111,19 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                                     collatorLastRound1Apr +
                                     collatorRound.apr) /
                                 4
+                            await ctx.store.save(staker)
                             ctx.log.info(`${round.index - 6}-${staker.stashId} apr24h: ${staker.apr24h} marker ${2}`)
                         }
                     } else {
                         staker.apr24h = collatorRound.apr / 4
+                        await ctx.store.save(staker)
                         ctx.log.info(`apr24h: ${staker.apr24h} marker ${3}`)
                     }
                 } else {
                     staker.apr24h = collatorRound.apr / 4
+                    await ctx.store.save(staker)
                     ctx.log.info(`apr24h: ${staker.apr24h} marker ${5}`)
                 }
-                await ctx.store.save(staker)
             }
 
             await ctx.store.insert(

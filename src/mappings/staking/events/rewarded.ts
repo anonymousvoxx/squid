@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { UnknownVersionError } from '../../../common/errors'
 import { encodeId } from '../../../common/tools'
-import { Reward, Round, RoundCollator } from '../../../model'
+import { HistoryElement, Reward, Round, RoundCollator } from '../../../model'
 import { ParachainStakingRewardedEvent } from '../../../types/generated/events'
 import { CommonHandlerContext, EventContext, EventHandlerContext } from '../../types/contexts'
 import { ActionData } from '../../types/data'
@@ -54,7 +54,6 @@ export interface RewardData extends ActionData {
 
 export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
     const staker = await getOrCreateStaker(ctx, data.accountId)
-    assert(staker != null)
     if (staker != null && staker?.role === 'collator') {
         staker.totalReward += data.amount
 
@@ -141,6 +140,17 @@ export async function saveReward(ctx: CommonHandlerContext, data: RewardData) {
                     amount: data.amount,
                     round: Math.min((round?.index || 0) - RewardPaymentDelay, 0),
                     staker,
+                })
+            )
+            await ctx.store.insert(
+                new HistoryElement({
+                    id: data.id,
+                    blockNumber: ctx.block.height,
+                    timestamp: new Date(ctx.block.timestamp),
+                    type: 2,
+                    round: round,
+                    amount: data.amount,
+                    staker: staker,
                 })
             )
         }

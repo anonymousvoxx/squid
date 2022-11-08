@@ -1,6 +1,6 @@
 import { UnknownVersionError } from '../../../common/errors'
 import { encodeId } from '../../../common/tools'
-import {HistoryElement, Round, RoundCollator} from '../../../model'
+import {HistoryElement, Round, RoundCollator, Delegator} from '../../../model'
 import { ParachainStakingDelegationDecreasedEvent } from '../../../types/generated/events'
 import { EventContext, EventHandlerContext } from '../../types/contexts'
 import {createStaker, getOrCreateStaker} from "../../util/entities";
@@ -46,6 +46,8 @@ export async function handleDelegationDecreased(ctx: EventHandlerContext) {
         })
     }
 
+    const delegator = await ctx.store.get(Delegator, {where: {id: accountId }})
+
     await ctx.store.insert(new HistoryElement({
         id: ctx.event.id,
         blockNumber: ctx.block.height,
@@ -54,6 +56,7 @@ export async function handleDelegationDecreased(ctx: EventHandlerContext) {
         round: round,
         amount: data.amount,
         staker: staker,
+        delegator: delegator
     }))
 
     if (round && staker) {

@@ -1,7 +1,8 @@
 import { UnknownVersionError } from '../../../common/errors'
 import { ParachainStakingNewRoundEvent } from '../../../types/generated/events'
 import { EventContext, EventHandlerContext } from '../../types/contexts'
-import { Round, RoundCollator, RoundNomination, RoundNominator } from '../../../model'
+import { Round, RoundCollator, RoundNomination, RoundNominator, Collator,
+  Delegator } from '../../../model'
 import assert from 'assert'
 import storage from '../../../storage'
 import { getCollatorsData } from '../../util/stakers'
@@ -76,9 +77,9 @@ export async function handleNewRound(ctx: EventHandlerContext) {
                 id: `${round.index}-${collatorData.id}`,
                 round,
                 staker,
-                selfBond: collatorData.bond,
+                ownBond: collatorData.bond,
                 totalBond: totalBond,
-                commission: DefaultCollatorCommission,
+                rewardAmount: DefaultCollatorCommission,
                 nominatorsCount: collatorData.nominators.length,
             })
         )

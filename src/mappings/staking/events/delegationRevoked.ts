@@ -1,9 +1,9 @@
 import { UnknownVersionError } from '../../../common/errors'
 import { encodeId } from '../../../common/tools'
-import {HistoryElement, Round, RoundCollator} from '../../../model'
+import { HistoryElement, Round, RoundCollator, Delegator } from '../../../model'
 import { ParachainStakingDelegationRevokedEvent } from '../../../types/generated/events'
 import { EventContext, EventHandlerContext } from '../../types/contexts'
-import {createStaker, getOrCreateStaker} from "../../util/entities";
+import { createStaker, getOrCreateStaker } from '../../util/entities'
 
 interface EventData {
     account: Uint8Array
@@ -42,22 +42,28 @@ export async function handleDelegationRevoked(ctx: EventHandlerContext) {
         await createStaker(ctx, {
             stashId: accountId,
             activeBond: 0n,
-            role: 'delegator'
+            role: 'delegator',
         })
     }
+    const delegator = await ctx.store.get(Delegator, { where: { id: accountId } })
 
-    await ctx.store.insert(new HistoryElement({
-        id: ctx.event.id,
-        blockNumber: ctx.block.height,
-        timestamp: new Date(ctx.block.timestamp),
-        type: 1,
-        round: round,
-        amount: data.amount,
-        staker: staker,
-    }))
+    await ctx.store.insert(
+        new HistoryElement({
+            id: ctx.event.id,
+            blockNumber: ctx.block.height,
+            timestamp: new Date(ctx.block.timestamp),
+            type: 1,
+            round: round,
+            amount: data.amount,
+            staker: staker,
+            delegator: delegator,
+        })
+    )
 
     if (round && staker) {
-        const collatorRound = await ctx.store.get(RoundCollator, {where: {id: `${round?.index}-${staker?.stashId}`}})
+        const collatorRound = await ctx.store.get(RoundCollator, {
+            where: { id: `${round?.index}-${staker?.stashId}` },
+        })
         if (collatorRound) {
             collatorRound.totalBond = collatorRound.totalBond - data.amount
             collatorRound.round = round

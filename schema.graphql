@@ -5,6 +5,16 @@ type Account @entity {
   lastUpdateBlock: Int!
 }
 
+type Collator @entity {
+  id: ID!
+  bond: BigInt
+  apr24h: Float
+}
+
+type Delegator @entity {
+  id: ID!
+}
+
 type Staker @entity {
   id: ID! #stash Id
   stashId: ID!
@@ -46,9 +56,9 @@ type Round @entity {
 type RoundCollator @entity {
   id: ID!
   round: Round!
-  selfBond: BigInt!
+  ownBond: BigInt
   totalBond: BigInt!
-  commission: Float!
+  rewardAmount: Float
   apr: Float
   aprTechnNumerator: Float
   aprTechnDenominator: Float
@@ -56,6 +66,7 @@ type RoundCollator @entity {
   nominatorsCount: Int!
   stakerId: ID!
   staker: Staker!
+  collator: Collator
 }
 
 type RoundNominator @entity {
@@ -80,6 +91,8 @@ type HistoryElement @entity {
   id: ID!
   blockNumber: Int!
   staker: Staker
+  delegator: Delegator
+  collator: Collator
   timestamp: DateTime!
   type: Int!
   round: Round!

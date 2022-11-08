@@ -1,6 +1,6 @@
 import { UnknownVersionError } from '../../../common/errors'
 import { encodeId } from '../../../common/tools'
-import {HistoryElement, Round, RoundCollator} from '../../../model'
+import {HistoryElement, Round, RoundCollator, Collator} from '../../../model'
 import { ParachainStakingCandidateBondedLessEvent } from '../../../types/generated/events'
 import { EventContext, EventHandlerContext } from '../../types/contexts'
 import {createStaker, getOrCreateStaker} from "../../util/entities";
@@ -45,6 +45,7 @@ export async function handleBondedLess(ctx: EventHandlerContext) {
             role: 'collator'
         })
     }
+    const collator = await ctx.store.get(Collator, {where: {id: accountId }})
 
     await ctx.store.insert(new HistoryElement({
         id: ctx.event.id,
@@ -54,12 +55,12 @@ export async function handleBondedLess(ctx: EventHandlerContext) {
         round: round,
         amount: data.amount,
         staker: staker,
+        collator: collator
     }))
 
     if (round && staker) {
         const collatorRound = await ctx.store.get(RoundCollator, {where: {id: `${round.index}-${staker?.stashId}` }})
         if (collatorRound) {
-            collatorRound.selfBond = collatorRound.selfBond - data.amount
             collatorRound.round = round
             collatorRound.totalBond = data.newTotal
             await ctx.store.save(collatorRound)

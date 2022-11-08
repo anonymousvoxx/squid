@@ -1,6 +1,8 @@
 import {
     Account,
     Staker,
+    Delegator,
+    Collator
 } from '../../model'
 import { CommonHandlerContext } from '../types/contexts'
 import { createPrevStorageContext, getMeta } from './actions'
@@ -155,6 +157,14 @@ export async function createStaker(ctx: CommonHandlerContext, data: StakerData) 
         commission: data.commission || DefaultCollatorCommission,
     })
     await ctx.store.save(staker)
+    if (data.role === 'collator') {
+      const collator = new Collator({id: data.stashId})
+      await ctx.store.save(staker)
+    }
+    if (data.role === 'delegator') {
+      const collator = new Delegator({id: data.stashId})
+      await ctx.store.save(staker)
+    }
 
     return staker
 }

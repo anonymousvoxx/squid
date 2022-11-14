@@ -1,11 +1,11 @@
 import { ProcessorConfig } from './types/custom/processorConfig'
 
 const config: ProcessorConfig = {
-    chainName: 'moonbeam',
-    prefix: 'moonbeam',
+    chainName: 'moonbase-alpha',
+    prefix: '',
     dataSource: {
-        archive: 'https://moonbeam.archive.subsquid.io/graphql',
-        chain: 'wss://wss.api.moonbeam.network',
+        archive: 'https://moonbase.archive.subsquid.io/graphql',
+        chain: 'wss://wss.api.moonbase.moonbeam.network',
     },
     typesBundle: 'moonbeam',
     batchSize: 100,
